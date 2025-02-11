@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#visual practice rev0.1 G.Sahuc fev/2025
+#Visual Practice rev0.1 Guillaume Sahuc fev/2025
 
 class ZoomableGraphicsView(QGraphicsView):
     def __init__(self, *args, **kwargs):
@@ -16,7 +16,7 @@ class ZoomableGraphicsView(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
     def wheelEvent(self, event):
-        zoom_factor = 1.25
+        zoom_factor = 1.05
         if event.angleDelta().y() > 0:
             self.scale(zoom_factor, zoom_factor)
         else:
@@ -25,19 +25,25 @@ class ZoomableGraphicsView(QGraphicsView):
 class NoteTextItem(QGraphicsTextItem):
     def __init__(self, x, y, note, *args, **kwargs):
         super().__init__(note, *args, **kwargs)
-        self.setDefaultTextColor(QColor("#BC8F8F"))
-        font = QFont()
+        self.setDefaultTextColor(QColor("black"))
+        font = QFont("Courier New")
         font.setPointSize(10)
         font.setBold(True)
         self.setFont(font)
         self.setZValue(1000.0)
-        self.setPos(x - 8, y + 25)
+        self.setPos(x - 11, y + 30)
 
 class NoteItem(QGraphicsEllipseItem):
-    def __init__(self, x, y, note, *args, **kwargs):
+    def __init__(self, x, y, note, is_first_note=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setRect(QRectF(x - 10 , y + 30, 20, 20))
         self.setBrush(QBrush(QColor("#FAEBD7")))
+
+        pen = QPen()
+        if is_first_note:
+            pen.setWidth(3)
+            pen.setColor(QColor("#7EC0EE"))
+        self.setPen(pen)
 
         text_item = NoteTextItem(x, y, note)
         text_item.setParentItem(self)
@@ -63,6 +69,8 @@ class NeckItem(QGraphicsItem):
         return QRectF(0, 0, (self.frets + 1) * 50, self.strings * 30)
 
     def paint(self, painter: QPainter, option, widget=None):
+        pen = QPen(QColor("#EEDFCC"))  # Définir la couleur du stylo pour les lignes
+        painter.setPen(pen)
         for fret in range(self.frets + 1):
             for string in range(self.strings):
                 x = fret * 50
@@ -76,7 +84,7 @@ class GuitarNeck:
 
         self.frets = 12
         self.strings = num_strings
-        self.fret_labels = [0, 3, 5, 7,9 , 12, 15, 17, 19, 21, 24]
+        self.fret_labels = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]
         self.note_pattern = note_pattern if note_pattern is not None else self.note_names
         self.scene = scene
         self.x_offset = x_offset
@@ -107,13 +115,14 @@ class GuitarNeck:
         for string in range(self.strings):
             for fret in range(self.frets + 1):
                 note = self.get_note_for_position(string, fret)
+                is_first_note = (note == self.note_pattern[0])
                 if note in self.note_pattern:
                     x = fret * 50 + self.x_offset
                     y = string * 30 + self.y_offset
-                    self.add_note_item(x, y, note)
+                    self.add_note_item(x, y, note, is_first_note)
 
-    def add_note_item(self, x, y, note):
-        note_item = NoteItem(x, y, note)
+    def add_note_item(self, x, y, note, is_first_note=False):
+        note_item = NoteItem(x, y, note, is_first_note)
         self.scene.addItem(note_item)
 
 def main():
