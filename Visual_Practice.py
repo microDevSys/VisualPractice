@@ -38,14 +38,13 @@ class NoteItem(QGraphicsEllipseItem):
         super().__init__(*args, **kwargs)
         self.setRect(QRectF(x - 10 , y + 30, 20, 20))
         self.setBrush(QBrush(QColor("#FAEBD7")))
-        
 
         pen = QPen()
         if is_first_note:
             pen.setWidth(3)
             pen.setColor(QColor("#7EC0EE"))
-            self.setBrush(QBrush(QColor("#7EC0EE")))
         self.setPen(pen)
+
         text_item = NoteTextItem(x, y, note)
         text_item.setParentItem(self)
 
@@ -79,11 +78,11 @@ class NeckItem(QGraphicsItem):
                 painter.drawRect(x + 25, y + 40, 50, 30)
 
 class GuitarNeck:
-    def __init__(self, scene, x_offset, y_offset, num_strings, frets, note_pattern=None):
+    def __init__(self, scene, x_offset, y_offset, num_strings, note_pattern=None):
         self.note_names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
         self.string_tunings = ['E', 'B', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#'][:num_strings]  # Réglages pour un maximum de 10 cordes
 
-        self.frets = frets
+        self.frets = 12
         self.strings = num_strings
         self.fret_labels = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]
         self.note_pattern = note_pattern if note_pattern is not None else self.note_names
@@ -130,24 +129,46 @@ def main():
     app = QApplication(sys.argv)
 
     scene = QGraphicsScene()
-    scene.setSceneRect(-100, -100, 3200, 1800)  # Définir la taille de la scène
+    scene.setSceneRect(-100, -100, 3200, 1200)  # Définir la taille de la scène
 
-    num_frets = 12
     num_strings = 7  # Définir le nombre de cordes souhaité, entre 6 et 10
-    note_pattern = ['C','D#','G']  # Exemple de modèle de notes
+    note_pattern = ['C', 'E', 'G']  # Exemple de modèle de notes
     num_columns = 3  # Nombre de colonnes
 
     cycle_of_fifths = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F']
 
+    # Ajoute l'image en arrière-plan
+    pixmap = QPixmap("guitar.png")  # Remplace par le chemin de ton image
+    scene.image_item = QGraphicsPixmapItem(pixmap)
+    scene.image_item.setPos(500, 0)  # Positionne l'image à (700, 0)
+    opacity_effect = QGraphicsOpacityEffect()
+    opacity_effect.setOpacity(0.3)  # X% de transparence
+    scene.image_item.setGraphicsEffect(opacity_effect)
+    scene.addItem(scene.image_item)
+
+    # Ajoute le texte
+    scene.text_item = QGraphicsTextItem("Visual Practice")
+    font = QFont("Engraved MT", 20)
+    scene.text_item.setFont(font)
+    scene.text_item.setDefaultTextColor(Qt.white)
+
+    # Positionne le texte centré en haut
+    text_rect = scene.text_item.boundingRect()
+    text_x = 300
+    scene.text_item.setPos(text_x, -50)
+    scene.addItem(scene.text_item)
+
     for i in range(12):
-        x_offset = (i % num_columns) * 62.5 * num_frets
+        x_offset = (i % num_columns) * 700
         y_offset = (i // num_columns) * 250
         # Calculer le nouveau pattern pour les quintes
         current_pattern = [(cycle_of_fifths[(cycle_of_fifths.index(note) + i) % 12]) for note in note_pattern]
-        GuitarNeck(scene, x_offset, y_offset, num_strings,num_frets, current_pattern)
+        GuitarNeck(scene, x_offset, y_offset, num_strings, current_pattern)
 
     view = ZoomableGraphicsView(scene)
-    view.show()
+    view.scale(1 / 1.3, 1 / 1.3)
+    view.centerOn(0, 0)
+    view.showMaximized()
 
     sys.exit(app.exec())
 
