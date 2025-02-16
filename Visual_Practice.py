@@ -4,6 +4,7 @@ from PySide6.QtGui import *
 from PySide6.QtCore import *
 
 #Visual Practice rev0.1 © Guillaume Sahuc fev/2025 
+#https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
 class ZoomableGraphicsView(QGraphicsView):
