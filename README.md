@@ -1,5 +1,5 @@
-installation = 
-require : 
+installation = <br>
+require : <br>
   1)python  : https://www.python.org/downloads/<br>
   2)Pysid6  : on a prompt use : pip install PySide6<br>
 
