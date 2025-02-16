@@ -78,11 +78,11 @@ class NeckItem(QGraphicsItem):
                 painter.drawRect(x + 25, y + 40, 50, 30)
 
 class GuitarNeck:
-    def __init__(self, scene, x_offset, y_offset, num_strings, note_pattern=None):
+    def __init__(self, scene, x_offset, y_offset, num_strings, num_frets, note_pattern=None):
         self.note_names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
         self.string_tunings = ['E', 'B', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#'][:num_strings]  # Réglages pour un maximum de 10 cordes
 
-        self.frets = 12
+        self.frets = num_frets
         self.strings = num_strings
         self.fret_labels = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]
         self.note_pattern = note_pattern if note_pattern is not None else self.note_names
@@ -125,48 +125,113 @@ class GuitarNeck:
         note_item = NoteItem(x, y, note, is_first_note)
         self.scene.addItem(note_item)
 
+class Pattern:
+    def __init__(self, name, notes):
+        self.name = name
+        self.notes = notes
+
+    def __repr__(self):
+        return f"Pattern(name={self.name}, notes={self.notes})"
+
+
+
 def main():
     app = QApplication(sys.argv)
+    
+    #initialisation de plusieurs patterns
+    patterns = [
+        Pattern("Major arpeggio", ['C', 'E', 'G']),
+        Pattern("Minor arpeggio", ['A', 'C', 'E']),
+        Pattern("Pentatonic Major Scale", ['C', 'D', 'E', 'G', 'A']),
+        Pattern("Pentatonic Minor Scale", ['A', 'C', 'D', 'E', 'G']),
+        Pattern("Major Scale", ['C', 'D', 'E', 'F', 'G', 'A', 'B']),
+        Pattern("Minor Scale", ['A', 'B', 'C', 'D', 'E', 'F', 'G']),
+        Pattern("Byzantine Scale", ['C', 'C#', 'E', 'F', 'G', 'G#', 'B']),
+]
 
     scene = QGraphicsScene()
-    scene.setSceneRect(-100, -100, 3200, 1200)  # Définir la taille de la scène
+    scene.setSceneRect(-100, -100, 6000, 2000)  # Définir la taille de la scène
 
     num_strings = 7  # Définir le nombre de cordes souhaité, entre 6 et 10
-    note_pattern = ['C', 'E', 'G']  # Exemple de modèle de notes
     num_columns = 3  # Nombre de colonnes
+    num_frets = 12   # Nombre de frettes
 
     cycle_of_fifths = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F']
 
     # Ajoute l'image en arrière-plan
     pixmap = QPixmap("guitar.png")  # Remplace par le chemin de ton image
-    scene.image_item = QGraphicsPixmapItem(pixmap)
-    scene.image_item.setPos(500, 0)  # Positionne l'image à (700, 0)
+    # Agrandir l'image par 2
+    scaled_pixmap = pixmap.scaled(pixmap.width() * 2, pixmap.height() * 2)
+    scene.image_item = QGraphicsPixmapItem(scaled_pixmap)
+    scene.image_item.setPos(0, 0)  # Positionne l'image à (700, 0)
     opacity_effect = QGraphicsOpacityEffect()
     opacity_effect.setOpacity(0.3)  # X% de transparence
     scene.image_item.setGraphicsEffect(opacity_effect)
     scene.addItem(scene.image_item)
+    
 
     # Ajoute le texte
-    scene.text_item = QGraphicsTextItem("Visual Practice")
+    scene.text_item = QGraphicsTextItem("Visual Practice : ")
     font = QFont("Engraved MT", 20)
     scene.text_item.setFont(font)
     scene.text_item.setDefaultTextColor(Qt.white)
+
+    # Créer un QComboBox et ajouter les noms des patterns
+    combo_box = QComboBox()
+    #combo_box.setFixedSize(300, 35)  # Définir la taille du QComboBox (largeur x hauteur)
+    # Définir une nouvelle police et l'appliquer au QComboBox
+    font = QFont()
+    font.setPointSize(20)
+    combo_box.setFont(font)
+    for pattern in patterns:
+        combo_box.addItem(pattern.name)
+
 
     # Positionne le texte centré en haut
     text_rect = scene.text_item.boundingRect()
     text_x = 300
     scene.text_item.setPos(text_x, -50)
     scene.addItem(scene.text_item)
+    
+    # Intégrer le QComboBox dans la scène en utilisant un QGraphicsProxyWidget
+    proxy = QGraphicsProxyWidget()
+    proxy.setWidget(combo_box)
+    combo_x = 500
+    proxy.setPos(combo_x, -50)
+    scene.addItem(proxy)
+    
+    def clear_scene():
+        for item in scene.items():
+            if isinstance(item, (NeckItem, NoteItem, NoteTextItem, FretLabelItem)):
+                scene.removeItem(item)
 
-    for i in range(12):
-        x_offset = (i % num_columns) * 700
-        y_offset = (i // num_columns) * 250
-        # Calculer le nouveau pattern pour les quintes
-        current_pattern = [(cycle_of_fifths[(cycle_of_fifths.index(note) + i) % 12]) for note in note_pattern]
-        GuitarNeck(scene, x_offset, y_offset, num_strings, current_pattern)
 
+    def update_scene():
+        # Effacer tous les éléments de la scène
+        clear_scene()
+
+
+        # Récupérer le pattern sélectionné
+        selected_pattern_name = combo_box.currentText()
+        selected_pattern = next((pattern for pattern in patterns if pattern.name == selected_pattern_name), None)
+
+        if selected_pattern:
+            for i in range(12):
+                x_offset = (i % num_columns) * 62.5 * num_frets
+                y_offset = (i // num_columns) * 250
+                # Calculer le nouveau pattern pour les quintes
+                current_pattern = [(cycle_of_fifths[(cycle_of_fifths.index(note) + i) % 12]) for note in selected_pattern.notes]
+                GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, current_pattern)
+                
+
+
+    # Connecter le signal currentIndexChanged du QComboBox à la méthode update_scene
+    combo_box.currentIndexChanged.connect(update_scene)
+    
+    # Initialiser la scène avec le premier pattern
+    update_scene()
     view = ZoomableGraphicsView(scene)
-    view.scale(1 / 1.3, 1 / 1.3)
+    view.scale(1 / 1.4, 1 / 1.4)
     view.centerOn(0, 0)
     view.showMaximized()
 
