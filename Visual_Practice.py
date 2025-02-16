@@ -144,6 +144,8 @@ def main():
         Pattern("Minor arpeggio", ['A', 'C', 'E']),
         Pattern("Pentatonic Major Scale", ['C', 'D', 'E', 'G', 'A']),
         Pattern("Pentatonic Minor Scale", ['A', 'C', 'D', 'E', 'G']),
+        Pattern("Blues Major Scale", ['G', 'A', 'A#', 'B', 'D', 'E']),
+        Pattern("Blues Minor Scale", ['F', 'G#', 'A#', 'B', 'C', 'D#']),
         Pattern("Major Scale", ['C', 'D', 'E', 'F', 'G', 'A', 'B']),
         Pattern("Minor Scale", ['A', 'B', 'C', 'D', 'E', 'F', 'G']),
         Pattern("Byzantine Scale", ['C', 'C#', 'E', 'F', 'G', 'G#', 'B']),
