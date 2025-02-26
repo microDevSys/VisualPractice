@@ -335,7 +335,11 @@ class GuitarNeck:
 
     def generate_chord_notes(self, root, chord_type):
         chord_notes = []
-        key_info = get_key_signature(root)
+         # Vérifier si l'accord est mineur et ajuster la tonalité
+        if chord_type == "minor":
+            key_info = get_key_signature(f"{root} {chord_type}")
+        else:
+            key_info = get_key_signature(root)
         use_sharps = key_info["use_sharps"]
         for interval in CHORDS_INTERVALS[chord_type]:
             chord_note = get_note_by_interval(root, interval,use_sharps)
