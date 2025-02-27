@@ -1,14 +1,17 @@
 
+from operator import contains
 import sys
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.2 © Guillaume Sahuc fev/2025 
+#Visual Practice rev0.2 bugfix © Guillaume Sahuc fev/2025 
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
 #just a tools to practice, if you want to support my work : paypal.me/VisualPractice
+
+#at line 416 you can change num_strings.
 
 # Constants
 NOTE_FONT_SIZE = 10
@@ -31,6 +34,22 @@ enharmonic_notes = {
     "Fb": "E",  # Fa bémol est équivalent à Mi
     "B#": "C",  # Si dièse est équivalent à Do
     "E#": "F"  # Mi dièse est équivalent à Fa
+}
+
+enharmonic_tunings_notes = {
+    "F#": "Gb",  # Fa dièse est équivalent à Sol bémol
+    "C#": "Db",  # Do dièse est équivalent à Ré bémol
+    "G#": "Ab" # Sol dièse est équivalent à La bémol
+}
+
+enharmonic_accidentals_notes = {
+    "Bb" : "A#",
+    "Eb" : "D#",
+    "Ab" : "G#", 
+    "Db" : "C#",
+    "Gb" : "F#",
+    "Cb" : "B",
+    "Fb" : "E"
 }
 
 # Schéma des intervalles pour différents types de gammes
@@ -124,6 +143,10 @@ def get_note_by_interval(root_note, interval, use_sharps=True):
         root_note = enharmonic_notes[root_note]
     
     notes = notes_sharp if use_sharps else notes_flat
+    if notes == notes_flat and  "#" in root_note:
+        root_note = enharmonic_tunings_notes[root_note]
+    if notes == notes_sharp and  "b" in root_note:
+        root_note = enharmonic_accidentals_notes[root_note]
 
     # Trouve l'index de la note de départ
     start_index = notes.index(root_note)
@@ -167,6 +190,7 @@ def generate_scale(start_note, intervals, use_sharps=True):
     
     notes = notes_sharp if use_sharps else notes_flat
     scale = []
+
     start_index = notes.index(start_note)
     
     for step in intervals:
@@ -335,7 +359,7 @@ class GuitarNeck:
 
     def generate_chord_notes(self, root, chord_type):
         chord_notes = []
-         # Vérifier si l'accord est mineur et ajuster la tonalité
+        # Vérifier si l'accord est mineur et ajuster la tonalité
         if chord_type == "minor":
             key_info = get_key_signature(f"{root} {chord_type}")
         else:
@@ -387,11 +411,11 @@ def main():
     }
 
     scene = QGraphicsScene()
-    scene.setSceneRect(-100, -100, 6000, 2000)  # Définir la taille de la scène
+    scene.setSceneRect(-100, -100, 6000, 3000)  # Définir la taille de la scène
 
     num_strings = 7  # Définir le nombre de cordes souhaité, entre 6 et 10
-    num_columns = 3  # Nombre de colonnes de 2 à 6 
-    num_frets = 12   # Nombre de frettes de 12 à 24
+    num_columns = 3 # Nombre de colonnes de 2 à 6 
+    num_frets = 12   # Nombre de frettes de 12 à 24 
 
     # Ajoute l'image en arrière-plan
     pixmap = QPixmap("guitar.png")  # Remplace par le chemin de ton image
@@ -460,14 +484,14 @@ def main():
                 for i, (root, chord_type) in enumerate(scale):
                     # Calculer les offsets
                     x_offset = (i % num_columns) * 62.5 * num_frets
-                    y_offset = (i // num_columns) * 250
+                    y_offset = (i // num_columns) * 36 * num_strings
                     # Mettre à jour le manche avec les notes de la gamme
                     guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
                     guitar_neck.generate_chord_notes(root,chord_type)
 
                 for i in range(7,12): #keep blank guitar neck
                     x_offset = (i % num_columns) * 62.5 * num_frets
-                    y_offset = (i // num_columns) * 250
+                    y_offset = (i // num_columns) * 36 * num_strings
                     guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
         #---------------------------------------------------------------------------------------
         elif "All Chords -" in selected_pattern_name:
@@ -479,7 +503,7 @@ def main():
             i = 0
             for tonality in cycle:
                 x_offset = (i % num_columns) * 62.5 * num_frets
-                y_offset = (i // num_columns) * 250
+                y_offset = (i // num_columns) * 36 * num_strings
                 key_info = get_key_signature(tonality)
                 use_sharps = key_info["use_sharps"]
                 guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
@@ -494,7 +518,7 @@ def main():
             i = 0
             for tonality,scale in Scales.items():
                 x_offset = (i % num_columns) * 62.5 * num_frets
-                y_offset = (i // num_columns) * 250
+                y_offset = (i // num_columns) * 36 * num_strings
                 key_info = get_key_signature(tonality)
                 use_sharps = key_info["use_sharps"]
                 guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, scale)
