@@ -10,4 +10,6 @@ require : <br>
     num_frets = 12   # define numbers of frets from 12 to 24 
 
 
-![Capture d’écran 2025-02-16 173435](https://github.com/user-attachments/assets/a8aea8ba-11d7-48a0-a456-c377b5719e13)
+![Capture d’écran 2025-02-16 173435](https://github.com/user-attachments/assets/a8aea8ba-11d7-48a0-a456-c377b5719e13)<br>
+<br>
+![Capture d'écran 2025-03-01 073349](https://github.com/user-attachments/assets/814bc06c-3f63-49bc-bef0-19a11a743ce4)
