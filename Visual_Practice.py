@@ -377,6 +377,22 @@ class GuitarNeck:
 def main():
     app = QApplication(sys.argv)
     
+    #theme sombre par défaut
+    dark_palette = QPalette()
+    dark_palette.setColor(QPalette.Window, Qt.black)  # Fond noir
+    dark_palette.setColor(QPalette.WindowText, Qt.white)  # Texte blanc
+    dark_palette.setColor(QPalette.Base, Qt.black)  # Fond des widgets
+    dark_palette.setColor(QPalette.AlternateBase, Qt.darkGray)
+    dark_palette.setColor(QPalette.ToolTipBase, Qt.white)
+    dark_palette.setColor(QPalette.ToolTipText, Qt.white)
+    dark_palette.setColor(QPalette.Text, Qt.white)
+    dark_palette.setColor(QPalette.Button, Qt.darkGray)
+    dark_palette.setColor(QPalette.ButtonText, Qt.white)
+    dark_palette.setColor(QPalette.Highlight, Qt.blue)
+    dark_palette.setColor(QPalette.HighlightedText, Qt.black)
+    # Appliquer la palette
+    app.setPalette(dark_palette)
+    
     Chords_scales = {
         "C Major": [("C", "major"), ("D", "minor"), ("E", "minor"), ("F", "major"),
                     ("G", "major"), ("A", "minor"), ("B", "diminished")],
