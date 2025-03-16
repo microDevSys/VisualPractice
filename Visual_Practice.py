@@ -417,13 +417,7 @@ def main():
         "Eb Major": [("Eb", "major"), ("F", "minor"), ("G", "minor"), ("Ab", "major"),
                      ("Bb", "major"), ("C", "minor"), ("D", "diminished")],
         "Ab Major": [("Ab", "major"), ("Bb", "minor"), ("C", "minor"), ("Db", "major"),
-                     ("Eb", "major"), ("F", "minor"), ("G", "diminished")],
-        "Db Major": [("Db", "major"), ("Eb", "minor"), ("F", "minor"), ("Gb", "major"),
-                     ("Ab", "major"), ("Bb", "minor"), ("C", "diminished")],
-        "Gb Major": [("Gb", "major"), ("Ab", "minor"), ("Bb", "minor"), ("Cb", "major"),
-                     ("Db", "major"), ("Eb", "minor"), ("F", "diminished")],
-        "Cb Major": [("Cb", "major"), ("Db", "minor"), ("Eb", "minor"), ("Fb", "major"),
-                     ("Gb", "major"), ("Ab", "minor"), ("Bb", "diminished")]
+                     ("Eb", "major"), ("F", "minor"), ("G", "diminished")]
     }
 
     scene = QGraphicsScene()
