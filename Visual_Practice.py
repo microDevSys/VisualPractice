@@ -410,14 +410,14 @@ def main():
                      ("C#", "major"), ("D#", "minor"), ("E#", "diminished")],
         "C# Major": [("C#", "major"), ("D#", "minor"), ("E#", "minor"), ("F#", "major"),
                      ("G#", "major"), ("A#", "minor"), ("B#", "diminished")],
-        "F Major": [("F", "major"), ("G", "minor"), ("A", "minor"), ("Bb", "major"),
-                    ("C", "major"), ("D", "minor"), ("E", "diminished")],
-        "Bb Major": [("Bb", "major"), ("C", "minor"), ("D", "minor"), ("Eb", "major"),
-                     ("F", "major"), ("G", "minor"), ("A", "diminished")],
+        "Ab Major": [("Ab", "major"), ("Bb", "minor"), ("C", "minor"), ("Db", "major"),
+                     ("Eb", "major"), ("F", "minor"), ("G", "diminished")],
         "Eb Major": [("Eb", "major"), ("F", "minor"), ("G", "minor"), ("Ab", "major"),
                      ("Bb", "major"), ("C", "minor"), ("D", "diminished")],
-        "Ab Major": [("Ab", "major"), ("Bb", "minor"), ("C", "minor"), ("Db", "major"),
-                     ("Eb", "major"), ("F", "minor"), ("G", "diminished")]
+        "Bb Major": [("Bb", "major"), ("C", "minor"), ("D", "minor"), ("Eb", "major"),
+                     ("F", "major"), ("G", "minor"), ("A", "diminished")],
+        "F Major": [("F", "major"), ("G", "minor"), ("A", "minor"), ("Bb", "major"),
+                    ("C", "major"), ("D", "minor"), ("E", "diminished")]
     }
 
     scene = QGraphicsScene()
