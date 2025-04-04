@@ -1,17 +1,13 @@
-
-from operator import contains
 import sys
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.2 bugfix © Guillaume Sahuc fev/2025 
+#Visual Practice rev0.3 © Guillaume Sahuc fev/2025 
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
 #just a tools to practice, if you want to support my work : paypal.me/VisualPractice
-
-#at line 416 you can change num_strings.
 
 # Constants
 NOTE_FONT_SIZE = 10
@@ -43,7 +39,6 @@ enharmonic_tunings_notes = {
 }
 
 enharmonic_accidentals_notes = {
-    "Bb" : "A#",
     "Eb" : "D#",
     "Ab" : "G#", 
     "Db" : "C#",
@@ -377,7 +372,6 @@ class GuitarNeck:
 def main():
     app = QApplication(sys.argv)
     
-    #theme sombre par défaut
     dark_palette = QPalette()
     dark_palette.setColor(QPalette.Window, Qt.black)  # Fond noir
     dark_palette.setColor(QPalette.WindowText, Qt.white)  # Texte blanc
@@ -423,10 +417,6 @@ def main():
     scene = QGraphicsScene()
     scene.setSceneRect(-100, -100, 6000, 3000)  # Définir la taille de la scène
 
-    num_strings = 7  # Définir le nombre de cordes souhaité, entre 6 et 10
-    num_columns = 3 # Nombre de colonnes de 2 à 6 
-    num_frets = 12   # Nombre de frettes de 12 à 24 
-
     # Ajoute l'image en arrière-plan
     pixmap = QPixmap("guitar.png")  # Remplace par le chemin de ton image
     # Agrandir l'image par 2
@@ -440,17 +430,23 @@ def main():
     
     # Ajoute le texte
     scene.text_item = QGraphicsTextItem("Visual Practice : ")
-    font = QFont("Engraved MT", 20)
+    font = QFont("Engraved MT", 18)
+    font.setBold(True)
     scene.text_item.setFont(font)
-    scene.text_item.setDefaultTextColor(Qt.white)
+    scene.text_item.setDefaultTextColor(QColor(255, 165, 0))
 
     # Créer un QComboBox et ajouter les noms des patterns
     combo_box = QComboBox()
     combo_box.setMaxVisibleItems(20)
     # Définir une nouvelle police et l'appliquer au QComboBox
-    font = QFont()
-    font.setPointSize(20)
     combo_box.setFont(font)
+    # Appliquer la couleur orange au texte via QPalette
+    palette = combo_box.palette()
+    palette.setColor(QPalette.Text, QColor("orange"))
+    palette.setColor(QPalette.Button, QColor("black"))
+    palette.setColor(QPalette.Base, QColor("black")) 
+    combo_box.setPalette(palette)
+
     for mode_name in SCALE_TYPES.keys():
         combo_box.addItem(mode_name)
         
@@ -472,7 +468,32 @@ def main():
     proxy.setWidget(combo_box)
     combo_x = 500
     proxy.setPos(combo_x, -50)
+    proxy.setZValue(100)
     scene.addItem(proxy)
+    
+    text_item = QGraphicsTextItem("Strings : ")
+    text_item.setFont(font)
+    text_item.setDefaultTextColor(QColor(255, 165, 0))  # Orange
+    text_item.setPos(1000, -50)  # Position du texte
+    # Ajout à la scène
+    scene.addItem(text_item)
+    
+    
+    string_combo_box = QComboBox()
+    string_combo_box.setFont(font)
+    string_combo_box.setPalette(palette)
+    for i in range(4, 11):
+        string_combo_box.addItem(str(i), i)
+    string_combo_box.setCurrentText("7")
+    proxy2 = QGraphicsProxyWidget()
+    proxy2.setWidget(string_combo_box)
+    proxy2.setPos(1200, -50)
+    proxy2.setZValue(100)
+    scene.addItem(proxy2)
+
+    
+    num_columns = 3 # Nombre de colonnes de 2 à 6 
+    num_frets = 12   # Nombre de frettes de 12 à 24 
     
     def clear_scene():
         for item in scene.items():
@@ -480,6 +501,7 @@ def main():
                 scene.removeItem(item)
 
     def update_scene():
+        num_strings = string_combo_box.currentData()  # Sélection du nombre de cordes
         # Effacer tous les éléments de la scène
         clear_scene()
 
@@ -535,9 +557,13 @@ def main():
                 guitar_neck.create_root_label(f"{tonality.split()[0]} {selected_pattern_name}")
                 guitar_neck.create_notes(use_sharps)
                 i += 1
+        view.resetTransform()
+        view.scale(1 / 1.4, 1 / 1.4)
+        view.centerOn(0, 0)
 
     # Connecter le signal currentIndexChanged du QComboBox à la méthode update_scene
     combo_box.currentIndexChanged.connect(update_scene)
+    string_combo_box.currentTextChanged.connect(update_scene)
     view = ZoomableGraphicsView(scene)
     view.scale(1 / 1.4, 1 / 1.4)
     view.centerOn(0, 0)
