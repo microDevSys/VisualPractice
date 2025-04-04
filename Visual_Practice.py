@@ -242,7 +242,7 @@ class NoteTextItem(QGraphicsTextItem):
         font.setPointSize(NOTE_FONT_SIZE)
         font.setBold(True)
         self.setFont(font)
-        self.setZValue(1000.0)
+        self.setZValue(50)
         self.setPos(x - 11, y + 30)
 
 class NoteItem(QGraphicsEllipseItem):
@@ -268,7 +268,7 @@ class ChordLabelItem(QGraphicsTextItem):
         font.setPointSize(CHORD_LABEL_FONT_SIZE)
         font.setBold(True)
         self.setFont(font)
-        self.setZValue(1000.0)
+        self.setZValue(50)
         self.setPos(x, y)
 
 class FretLabelItem(QGraphicsTextItem):
@@ -279,7 +279,7 @@ class FretLabelItem(QGraphicsTextItem):
         font.setPointSize(FRET_FONT_SIZE)
         font.setBold(True)
         self.setFont(font)
-        self.setZValue(1000.0)
+        self.setZValue(50)
         self.setPos(x - 8, y + 10)
 
 class NeckItem(QGraphicsItem):
