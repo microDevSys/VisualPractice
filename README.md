@@ -7,7 +7,6 @@ require : <br>
 
   you can change : 
 
-    num_strings = 7  # Define numbers of strings max 10
     num_columns = 3  # define numbers of columns from 2 to 6
     num_frets = 12   # define numbers of frets from 12 to 24 
 
