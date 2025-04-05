@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.3 © Guillaume Sahuc fev/2025 
+#Visual Practice rev0.3 © Guillaume Sahuc 04/2025 
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -469,7 +469,7 @@ def main():
     text_item = QGraphicsTextItem("Strings : ")
     text_item.setFont(font)
     text_item.setDefaultTextColor(QColor(255, 165, 0))  # Orange
-    text_item.setPos(1000, -50)  # Position du texte
+    text_item.setPos(1080, -50)  # Position du texte
     # Ajout à la scène
     scene.addItem(text_item)
     
