@@ -375,7 +375,7 @@ def main():
     dark_palette = QPalette()
     dark_palette.setColor(QPalette.Window, Qt.black)  # Fond noir
     dark_palette.setColor(QPalette.WindowText, Qt.white)  # Texte blanc
-    dark_palette.setColor(QPalette.Base, Qt.black)  # Fond des widgets
+    dark_palette.setColor(QPalette.Base, Qt.darkGray)  # Fond des widgets
     dark_palette.setColor(QPalette.AlternateBase, Qt.darkGray)
     dark_palette.setColor(QPalette.ToolTipBase, Qt.white)
     dark_palette.setColor(QPalette.ToolTipText, Qt.white)
@@ -440,12 +440,7 @@ def main():
     combo_box.setMaxVisibleItems(20)
     # Définir une nouvelle police et l'appliquer au QComboBox
     combo_box.setFont(font)
-    # Appliquer la couleur orange au texte via QPalette
-    palette = combo_box.palette()
-    palette.setColor(QPalette.Text, QColor("orange"))
-    palette.setColor(QPalette.Button, QColor("black"))
-    palette.setColor(QPalette.Base, QColor("black")) 
-    combo_box.setPalette(palette)
+    combo_box.setPalette(dark_palette)
 
     for mode_name in SCALE_TYPES.keys():
         combo_box.addItem(mode_name)
@@ -481,7 +476,7 @@ def main():
     
     string_combo_box = QComboBox()
     string_combo_box.setFont(font)
-    string_combo_box.setPalette(palette)
+    string_combo_box.setPalette(dark_palette)
     for i in range(4, 11):
         string_combo_box.addItem(str(i), i)
     string_combo_box.setCurrentText("7")
@@ -516,14 +511,14 @@ def main():
                 for i, (root, chord_type) in enumerate(scale):
                     # Calculer les offsets
                     x_offset = (i % num_columns) * 62.5 * num_frets
-                    y_offset = (i // num_columns) * 36 * num_strings
+                    y_offset = (i // num_columns) * 42 * num_strings
                     # Mettre à jour le manche avec les notes de la gamme
                     guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
                     guitar_neck.generate_chord_notes(root,chord_type)
 
                 for i in range(7,12): #keep blank guitar neck
                     x_offset = (i % num_columns) * 62.5 * num_frets
-                    y_offset = (i // num_columns) * 36 * num_strings
+                    y_offset = (i // num_columns) * 42 * num_strings
                     guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
         #---------------------------------------------------------------------------------------
         elif "All Chords -" in selected_pattern_name:
@@ -535,7 +530,7 @@ def main():
             i = 0
             for tonality in cycle:
                 x_offset = (i % num_columns) * 62.5 * num_frets
-                y_offset = (i // num_columns) * 36 * num_strings
+                y_offset = (i // num_columns) * 42 * num_strings
                 key_info = get_key_signature(tonality)
                 use_sharps = key_info["use_sharps"]
                 guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
@@ -550,7 +545,7 @@ def main():
             i = 0
             for tonality,scale in Scales.items():
                 x_offset = (i % num_columns) * 62.5 * num_frets
-                y_offset = (i // num_columns) * 36 * num_strings
+                y_offset = (i // num_columns) * 42 * num_strings
                 key_info = get_key_signature(tonality)
                 use_sharps = key_info["use_sharps"]
                 guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, scale)
