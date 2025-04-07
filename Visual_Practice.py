@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.3 © Guillaume Sahuc 04/2025 
+#Visual Practice rev0.4 © Guillaume Sahuc 04/2025 
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -473,7 +473,6 @@ def main():
     # Ajout à la scène
     scene.addItem(text_item)
     
-    
     string_combo_box = QComboBox()
     string_combo_box.setFont(font)
     string_combo_box.setPalette(dark_palette)
@@ -486,9 +485,45 @@ def main():
     proxy2.setZValue(100)
     scene.addItem(proxy2)
 
+    text_item = QGraphicsTextItem("Columns : ")
+    text_item.setFont(font)
+    text_item.setDefaultTextColor(QColor(255, 165, 0))  # Orange
+    text_item.setPos(1320, -50)  # Position du texte
+    # Ajout à la scène
+    scene.addItem(text_item)
     
-    num_columns = 3 # Nombre de colonnes de 2 à 6 
-    num_frets = 12   # Nombre de frettes de 12 à 24 
+    columns_combo_box = QComboBox()
+    columns_combo_box.setFont(font)
+    columns_combo_box.setPalette(dark_palette)
+    for i in range(2, 7):
+        columns_combo_box.addItem(str(i), i)
+    columns_combo_box.setCurrentText("3")
+    proxy3 = QGraphicsProxyWidget()
+    proxy3.setWidget(columns_combo_box)
+    proxy3.setPos(1450, -50)
+    proxy3.setZValue(100)
+    scene.addItem(proxy3)
+    
+    text_item = QGraphicsTextItem("Frets : ")
+    text_item.setFont(font)
+    text_item.setDefaultTextColor(QColor(255, 165, 0))  # Orange
+    text_item.setPos(1520, -50)  # Position du texte
+    # Ajout à la scène
+    scene.addItem(text_item)
+    
+    frets_combo_box = QComboBox()
+    frets_combo_box.setFont(font)
+    frets_combo_box.setPalette(dark_palette)
+    frets_combo_box.setMaxVisibleItems(15)
+    for i in range(12, 25):
+        frets_combo_box.addItem(str(i), i)
+    frets_combo_box.setCurrentText("12")
+    proxy4 = QGraphicsProxyWidget()
+    proxy4.setWidget(frets_combo_box)
+    proxy4.setPos(1620, -50)
+    proxy4.setZValue(100)
+    scene.addItem(proxy4)
+    
     
     def clear_scene():
         for item in scene.items():
@@ -497,6 +532,8 @@ def main():
 
     def update_scene():
         num_strings = string_combo_box.currentData()  # Sélection du nombre de cordes
+        num_columns = columns_combo_box.currentData() # Sélection du nombre de colonnes
+        num_frets = frets_combo_box.currentData()     # Sélection du nombre de frets
         # Effacer tous les éléments de la scène
         clear_scene()
 
@@ -559,6 +596,8 @@ def main():
     # Connecter le signal currentIndexChanged du QComboBox à la méthode update_scene
     combo_box.currentIndexChanged.connect(update_scene)
     string_combo_box.currentTextChanged.connect(update_scene)
+    columns_combo_box.currentTextChanged.connect(update_scene)
+    frets_combo_box.currentTextChanged.connect(update_scene)
     view = ZoomableGraphicsView(scene)
     view.scale(1 / 1.4, 1 / 1.4)
     view.centerOn(0, 0)
