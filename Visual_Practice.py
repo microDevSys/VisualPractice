@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.4 © Guillaume Sahuc 04/2025 
+#Visual Practice rev0.4b © Guillaume Sahuc 04/2025 
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -304,7 +304,13 @@ class GuitarNeck:
     def __init__(self, scene, x_offset, y_offset, num_strings, num_frets, note_pattern=None):
         self.frets = num_frets
         self.strings = num_strings
-        self.string_tunings = STRING_TUNINGS[:num_strings]  # Réglages
+        # Accordage spécial pour 4 ou 5 cordes
+        if num_strings == 5:
+            self.string_tunings = ['B', 'G', 'D', 'A', 'E']
+        elif num_strings == 4:
+            self.string_tunings = ['G', 'D', 'A', 'E']
+        else:
+            self.string_tunings = STRING_TUNINGS[:num_strings]
         self.note_pattern = note_pattern if note_pattern is not None else notes_sharp 
         self.scene = scene
         self.x_offset = x_offset
