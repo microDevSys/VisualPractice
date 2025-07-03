@@ -393,7 +393,7 @@ def main():
     # Appliquer la palette
     app.setPalette(dark_palette)
     
-   Chords_scales = {
+    Chords_scales = {
         "C Major": [("C", "major"), ("D", "minor"), ("E", "minor"), ("F", "major"),
                     ("G", "major"), ("A", "minor"), ("B", "diminished")],
         "G Major": [("G", "major"), ("A", "minor"), ("B", "minor"), ("C", "major"),
