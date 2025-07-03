@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.4b © Guillaume Sahuc 04/2025 
+#Visual Practice rev0.5 © Guillaume Sahuc 2025/07
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -306,9 +306,9 @@ class GuitarNeck:
         self.strings = num_strings
         # Accordage spécial pour 4 ou 5 cordes
         if num_strings == 5:
-            self.string_tunings = ['B', 'G', 'D', 'A', 'E']
+            self.string_tunings = STRING_TUNINGS[1:-4] #['B', 'G', 'D', 'A', 'E']
         elif num_strings == 4:
-            self.string_tunings = ['G', 'D', 'A', 'E']
+            self.string_tunings = STRING_TUNINGS[2:-4] #['G', 'D', 'A', 'E']
         else:
             self.string_tunings = STRING_TUNINGS[:num_strings]
         self.note_pattern = note_pattern if note_pattern is not None else notes_sharp 
@@ -393,7 +393,7 @@ def main():
     # Appliquer la palette
     app.setPalette(dark_palette)
     
-    Chords_scales = {
+   Chords_scales = {
         "C Major": [("C", "major"), ("D", "minor"), ("E", "minor"), ("F", "major"),
                     ("G", "major"), ("A", "minor"), ("B", "diminished")],
         "G Major": [("G", "major"), ("A", "minor"), ("B", "minor"), ("C", "major"),
@@ -417,9 +417,35 @@ def main():
         "Bb Major": [("Bb", "major"), ("C", "minor"), ("D", "minor"), ("Eb", "major"),
                      ("F", "major"), ("G", "minor"), ("A", "diminished")],
         "F Major": [("F", "major"), ("G", "minor"), ("A", "minor"), ("Bb", "major"),
-                    ("C", "major"), ("D", "minor"), ("E", "diminished")]
-    }
+                    ("C", "major"), ("D", "minor"), ("E", "diminished")],
+                    
 
+        "A Minor": [("A", "minor"), ("B", "diminished"), ("C", "major"), ("D", "minor"),
+                    ("E", "minor"), ("F", "major"), ("G", "major")],
+        "E Minor": [("E", "minor"), ("F#", "diminished"), ("G", "major"), ("A", "minor"),
+                    ("B", "minor"), ("C", "major"), ("D", "major")],
+        "B Minor": [("B", "minor"), ("C#", "diminished"), ("D", "major"), ("E", "minor"),
+                    ("F#", "minor"), ("G", "major"), ("A", "major")],
+        "F# Minor": [("F#", "minor"), ("G#", "diminished"), ("A", "major"), ("B", "minor"),
+                     ("C#", "minor"), ("D", "major"), ("E", "major")],
+        "C# Minor": [("C#", "minor"), ("D#", "diminished"), ("E", "major"), ("F#", "minor"),
+                     ("G#", "minor"), ("A", "major"), ("B", "major")],
+        "G# Minor": [("G#", "minor"), ("A#", "diminished"), ("B", "major"), ("C#", "minor"),
+                     ("D#", "minor"), ("E", "major"), ("F#", "major")],
+        "D# Minor": [("D#", "minor"), ("E#", "diminished"), ("F#", "major"), ("G#", "minor"),
+                     ("A#", "minor"), ("B", "major"), ("C#", "major")],
+        "A# Minor": [("A#", "minor"), ("B#", "diminished"), ("C#", "major"), ("D#", "minor"),
+                     ("E#", "minor"), ("F#", "major"), ("G#", "major")],
+        "F Minor": [("F", "minor"), ("G", "diminished"), ("Ab", "major"), ("Bb", "minor"),
+                    ("C", "minor"), ("Db", "major"), ("Eb", "major")],
+        "C Minor": [("C", "minor"), ("D", "diminished"), ("Eb", "major"), ("F", "minor"),
+                    ("G", "minor"), ("Ab", "major"), ("Bb", "major")],                   
+        "G Minor": [("G", "minor"), ("A", "diminished"), ("Bb", "major"), ("C", "minor"),
+                    ("D", "minor"), ("Eb", "major"), ("F", "major")],                    
+        "D Minor": [("D", "minor"), ("E", "diminished"), ("F", "major"), ("G", "minor"),
+                    ("A", "minor"), ("Bb", "major"), ("C", "major")]
+
+}
     scene = QGraphicsScene()
     scene.setSceneRect(-100, -100, 6000, 3000)  # Définir la taille de la scène
 
