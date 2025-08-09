@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.5 © Guillaume Sahuc 2025/07
+#Visual Practice rev0.6 © Guillaume Sahuc 2025/07
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -469,11 +469,34 @@ def main():
 
     # Créer un QComboBox et ajouter les noms des patterns
     combo_box = QComboBox()
-    combo_box.setMaxVisibleItems(20)
+    combo_box.setMaxVisibleItems(30)
     # Définir une nouvelle police et l'appliquer au QComboBox
     combo_box.setFont(font)
     combo_box.setPalette(dark_palette)
 
+    # Remplacer la vue interne par un QListView pour accéder aux barres de défilement
+    view = QListView()
+    combo_box.setView(view)
+
+    # Élargir la scrollbar verticale
+    scrollbar = view.verticalScrollBar()
+    scrollbar.setFixedWidth(35)  # largeur en px
+    scrollbar.setStyleSheet("""
+    QScrollBar:vertical {
+        background: #333;
+        width: 35px;
+        margin: 0px;
+    }
+    QScrollBar::handle:vertical {
+        background: #777;
+        min-height: 20px;
+    }
+    """)
+    
+    # Élargir la liste déroulante
+    view.setMinimumWidth(450)  # largeur de la fenêtre déroulante en px
+    
+    #ajout des éléments
     for mode_name in SCALE_TYPES.keys():
         combo_box.addItem(mode_name)
         
