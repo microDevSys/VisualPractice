@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.6 © Guillaume Sahuc 2025/07
+#Visual Practice rev0.7 © Guillaume Sahuc 2025/09
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -216,6 +216,27 @@ def generate_scales_in_cycle(scale_type, is_minor=False):
     
     return all_scales
 
+class SpaceComboBox(QComboBox):
+    """QComboBox qui avance/recul de façon circulaire avec Haut, Bas ou Espace."""
+    def keyPressEvent(self, event):
+        count = self.count()
+        if not count:
+            return
+
+        if event.key() == Qt.Key_Up:
+            # recule et boucle au dernier si on est au premier
+            self.setCurrentIndex((self.currentIndex() - 1) % count)
+
+        elif event.key() in (Qt.Key_Down, Qt.Key_Space):
+            # avance et boucle au premier si on est au dernier
+            self.setCurrentIndex((self.currentIndex() + 1) % count)
+
+            # éviter le comportement par défaut sur espace (validation du bouton par ex.)
+            if event.key() == Qt.Key_Space:
+                return
+
+        else:
+            super().keyPressEvent(event)
 
 class ZoomableGraphicsView(QGraphicsView):
     def __init__(self, *args, **kwargs):
@@ -468,11 +489,12 @@ def main():
     scene.text_item.setDefaultTextColor(QColor(255, 165, 0))
 
     # Créer un QComboBox et ajouter les noms des patterns
-    combo_box = QComboBox()
+    combo_box = SpaceComboBox()
     combo_box.setMaxVisibleItems(30)
     # Définir une nouvelle police et l'appliquer au QComboBox
     combo_box.setFont(font)
     combo_box.setPalette(dark_palette)
+    combo_box.setFocusPolicy(Qt.StrongFocus)      # important pour recevoir la barre d’espace
 
     # Remplacer la vue interne par un QListView pour accéder aux barres de défilement
     view = QListView()
@@ -647,6 +669,7 @@ def main():
         view.resetTransform()
         view.scale(1 / 1.4, 1 / 1.4)
         view.centerOn(0, 0)
+        combo_box.setFocus()
 
     # Connecter le signal currentIndexChanged du QComboBox à la méthode update_scene
     combo_box.currentIndexChanged.connect(update_scene)
