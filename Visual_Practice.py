@@ -2,7 +2,6 @@ import sys
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
-from PySide6.QtGui import *
 
 #Visual Practice rev0.8 © Guillaume Sahuc 2025/10
 #https://github.com/microDevSys/VisualPractice
@@ -724,4 +723,5 @@ def main():
     sys.exit(app.exec())
 
 if __name__ == "__main__":
+
     main()
