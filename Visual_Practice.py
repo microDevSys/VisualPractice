@@ -2,8 +2,9 @@ import sys
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
+from PySide6.QtGui import *
 
-#Visual Practice rev0.7 © Guillaume Sahuc 2025/09
+#Visual Practice rev0.8 © Guillaume Sahuc 2025/10
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -600,12 +601,47 @@ def main():
     proxy4.setPos(1620, -50)
     proxy4.setZValue(100)
     scene.addItem(proxy4)
+
+    # --- Ajout des boutons flèches bas/haut en bas à droite ---
+    arrow_down_btn = QPushButton()
+    arrow_down_btn.setIcon(QIcon("arrow-down-o.svg"))
+    arrow_down_btn.setIconSize(QSize(120, 120))
+    arrow_down_btn.setFixedSize(120, 120)
+
+    arrow_up_btn = QPushButton()
+    arrow_up_btn.setIcon(QIcon("arrow-up-o.svg"))
+    arrow_up_btn.setIconSize(QSize(120, 120))
+    arrow_up_btn.setFixedSize(120, 120)
+
+    def arrow_down():
+        count = combo_box.count()
+        if count:
+            combo_box.setCurrentIndex((combo_box.currentIndex() + 1) % count)
+    def arrow_up():
+        count = combo_box.count()
+        if count:
+            combo_box.setCurrentIndex((combo_box.currentIndex() - 1) % count)
+    arrow_down_btn.clicked.connect(arrow_down)
+    arrow_up_btn.clicked.connect(arrow_up)
     
+    proxy_down = QGraphicsProxyWidget()
+    proxy_down.setWidget(arrow_down_btn)
+    proxy_down.setZValue(200)
+    proxy_down.setOpacity(0.2)
+    proxy_up = QGraphicsProxyWidget()
+    proxy_up.setWidget(arrow_up_btn)
+    proxy_up.setZValue(200)
+    proxy_up.setOpacity(0.2)
     
     def clear_scene():
         for item in scene.items():
             if isinstance(item, (NeckItem, NoteItem, NoteTextItem, FretLabelItem, ChordLabelItem)):
                 scene.removeItem(item)
+        # Retirer les boutons proxy de la scène
+        if proxy_down in scene.items():
+            scene.removeItem(proxy_down)
+        if proxy_up in scene.items():
+            scene.removeItem(proxy_up)
 
     def update_scene():
         num_strings = string_combo_box.currentData()  # Sélection du nombre de cordes
@@ -613,6 +649,10 @@ def main():
         num_frets = frets_combo_box.currentData()     # Sélection du nombre de frets
         # Effacer tous les éléments de la scène
         clear_scene()
+        proxy_down.setPos(num_frets * num_columns * 50, (num_frets / num_columns)  * 40 * num_strings + 23 )
+        proxy_up.setPos((num_frets * num_columns * 50) + 130, (num_frets / num_columns)  * 40 * num_strings + 23)
+        scene.addItem(proxy_down)
+        scene.addItem(proxy_up)
 
         # Récupérer le pattern sélectionné
         selected_pattern_name = combo_box.currentText()
@@ -667,7 +707,7 @@ def main():
                 guitar_neck.create_notes(use_sharps)
                 i += 1
         view.resetTransform()
-        view.scale(1 / 1.4, 1 / 1.4)
+        view.scale(1 / 1.44, 1 / 1.44)
         view.centerOn(0, 0)
         combo_box.setFocus()
 
@@ -677,12 +717,10 @@ def main():
     columns_combo_box.currentTextChanged.connect(update_scene)
     frets_combo_box.currentTextChanged.connect(update_scene)
     view = ZoomableGraphicsView(scene)
-    view.scale(1 / 1.4, 1 / 1.4)
-    view.centerOn(0, 0)
+
     # Initialiser la scène avec le premier pattern
     update_scene()
     view.showMaximized()
-
     sys.exit(app.exec())
 
 if __name__ == "__main__":
