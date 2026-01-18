@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
 
-#Visual Practice rev0.7 © Guillaume Sahuc 2025/09
+#Visual Practice rev0.8 © Guillaume Sahuc 2026/01
 #https://github.com/microDevSys/VisualPractice
 #https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en
 
@@ -15,8 +15,18 @@ FRET_FONT_SIZE = 10
 CHORD_LABEL_FONT_SIZE = 18
 #YOU CAN CHOOSE COLOR HERE = http://guillaume.sahuc.free.fr/couleur.html
 NECK_COLOR = "#EEDFCC"
-FIRST_NOTE="#7EC0EE"
 NOTE_COLOR = "#FAEBD7"
+# Couleurs pour chaque degré (7 couleurs pour les 7 degrés d'une gamme)
+DEGREE_COLORS = [
+    "#00AAFF",  # 1er degré (tonique) - bleu
+    "#8B8B00",  # 2ème degré - or
+    "#4DD24D",  # 3ème degré - vert
+    "#FFA500",  # 4ème degré - orange
+    "#FF0000",  # 5ème degré - rouge
+    "#B139ED",  # 6ème degré - violet
+    "#A9A0A0"   # 7ème degré - gris
+]
+FIRST_NOTE= DEGREE_COLORS[0]  # Couleur du 1er degré (tonique)
 FRET_LABELS = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24]
 STRING_TUNINGS = ['E', 'B', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#']
 
@@ -70,19 +80,34 @@ SCALE_TYPES = {
 }
 
 CHORDS_INTERVALS = {
-    "major": [0, 4, 7],          # Fondamentale, Tierce Majeure, Quinte Juste
-    "minor": [0, 3, 7],          # Fondamentale, Tierce Mineure, Quinte Juste
-    "diminished": [0, 3, 6],     # Fondamentale, Tierce Mineure, Quinte Diminuée
-    "augmented": [0, 4, 8],      # Fondamentale, Tierce Majeure, Quinte Augmentée
-    "sus2": [0, 2, 7],           # Fondamentale, Seconde Majeure, Quinte Juste
-    "sus4": [0, 5, 7],           # Fondamentale, Quarte Juste, Quinte Juste
-    "dominant7": [0, 4, 7, 10],  # Fondamentale, Tierce Majeure, Quinte Juste, Septième Mineure
-    "maj7": [0, 4, 7, 11],       # Fondamentale, Tierce Majeure, Quinte Juste, Septième Majeure
-    "m7": [0, 3, 7, 10],    # Fondamentale, Tierce Mineure, Quinte Juste, Septième Mineure
-    "mMaj7": [0, 3, 7, 11], # Fondamentale, Tierce Mineure, Quinte Juste, Septième Majeure
-    "half_dim7": [0, 3, 6, 10],  # Fondamentale, Tierce Mineure, Quinte Diminuée, Septième Mineure
-    "dim7": [0, 3, 6, 9],        # Fondamentale, Tierce Mineure, Quinte Diminuée, Septième Diminuée
-    "7sus4": [0, 5, 7, 10]       # Fondamentale, Quarte Juste, Quinte Juste, Septième Mineure
+    "major": [0, 4, 7],          # Fondamentale (I), Tierce Majeure (III), Quinte Juste (V)
+    "minor": [0, 3, 7],          # Fondamentale (I), Tierce Mineure (bIII), Quinte Juste (V)
+    "diminished": [0, 3, 6],     # Fondamentale (I), Tierce Mineure (bIII), Quinte Diminuée (b5)
+    "augmented": [0, 4, 8],      # Fondamentale (I), Tierce Majeure (III), Quinte Augmentée (#5)
+    "sus2": [0, 2, 7],           # Fondamentale (I), Seconde Majeure (II), Quinte Juste (V)
+    "sus4": [0, 5, 7],           # Fondamentale (I), Quarte Juste (IV), Quinte Juste (V)
+    "dominant7": [0, 4, 7, 10],  # Fondamentale (I), Tierce Majeure (III), Quinte Juste (V), Septième Mineure (bVII)
+    "maj7": [0, 4, 7, 11],       # Fondamentale (I), Tierce Majeure (III), Quinte Juste (V), Septième Majeure (VII)
+    "m7": [0, 3, 7, 10],    # Fondamentale (I), Tierce Mineure (bIII), Quinte Juste (V), Septième Mineure (bVII)
+    "mMaj7": [0, 3, 7, 11], # Fondamentale (I), Tierce Mineure (bIII), Quinte Juste (V), Septième Majeure (VII)
+    "half_dim7": [0, 3, 6, 10],  # Fondamentale (I), Tierce Mineure (bIII), Quinte Diminuée (b5), Septième Mineure (bVII)
+    "dim7": [0, 3, 6, 9],        # Fondamentale (I), Tierce Mineure (bIII), Quinte Diminuée (b5), Septième Diminuée (bb7)
+    "7sus4": [0, 5, 7, 10]       # Fondamentale (I), Quarte Juste (IV), Quinte Juste (V), Septième Mineure (bVII)
+}
+
+# Mapping intervalle chromatique -> index de degré pour la couleur
+INTERVAL_TO_DEGREE = {
+    0: 0,   # Fondamentale -> I 
+    2: 1,   # Seconde Majeure -> II 
+    3: 2,   # Tierce Mineure -> bIII 
+    4: 2,   # Tierce Majeure -> III 
+    5: 3,   # Quarte Juste -> IV 
+    6: 4,   # Quinte Diminuée -> b5 
+    7: 4,   # Quinte Juste -> V 
+    8: 4,   # Quinte Augmentée -> #5 
+    9: 6,   # Septième Diminuée -> bb7 
+    10: 6,  # Septième Mineure -> bVII 
+    11: 6   # Septième Majeure -> VII 
 }
 
 
@@ -267,15 +292,22 @@ class NoteTextItem(QGraphicsTextItem):
         self.setPos(x - 11, y + 30)
 
 class NoteItem(QGraphicsEllipseItem):
-    def __init__(self, x, y, note, is_first_note=False, *args, **kwargs):
+    def __init__(self, x, y, note, is_first_note=False, degree_index=None, show_all_colors=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setRect(QRectF(x - 10 , y + 30, 20, 20))
         self.setBrush(QBrush(QColor(NOTE_COLOR)))
 
         pen = QPen()
-        if is_first_note:
-            pen.setWidth(3)
-            pen.setColor(QColor(FIRST_NOTE))
+        if show_all_colors:
+            # Mode toutes les couleurs
+            if degree_index is not None and 0 <= degree_index < len(DEGREE_COLORS):
+                pen.setWidth(3)
+                pen.setColor(QColor(DEGREE_COLORS[degree_index]))
+        else:
+            # Mode uniquement 1er degré
+            if is_first_note:
+                pen.setWidth(3)
+                pen.setColor(QColor(FIRST_NOTE))
         self.setPen(pen)
 
         text_item = NoteTextItem(x, y, note)
@@ -322,7 +354,7 @@ class NeckItem(QGraphicsItem):
                 painter.drawRect(x + 25, y + 40, 50, 30)
 
 class GuitarNeck:
-    def __init__(self, scene, x_offset, y_offset, num_strings, num_frets, note_pattern=None):
+    def __init__(self, scene, x_offset, y_offset, num_strings, num_frets, note_pattern=None, show_all_colors=True):
         self.frets = num_frets
         self.strings = num_strings
         # Accordage spécial pour 4 ou 5 cordes
@@ -337,6 +369,8 @@ class GuitarNeck:
         self.x_offset = x_offset
         self.y_offset = y_offset
         self.chord_type = ""
+        self.show_all_colors = show_all_colors
+        self.note_degrees = {}  # Dictionnaire pour stocker les degrés des notes dans les accords
         self.create_neck()
         self.create_fret_labels()
         #self.create_notes()
@@ -370,17 +404,27 @@ class GuitarNeck:
             for fret in range(self.frets + 1):
                 note = self.get_note_for_position(string, fret,use_sharps)
                 is_first_note = (note == self.note_pattern[0])
+                # Trouver l'index du degré dans le pattern
+                degree_index = None
+                if note in self.note_pattern:
+                    # Si c'est un accord (on a des degrés spécifiques), utiliser le mapping
+                    if self.note_degrees:
+                        degree_index = self.note_degrees.get(note, None)
+                    else:
+                        # Sinon, utiliser l'index dans le pattern (gammes)
+                        degree_index = self.note_pattern.index(note)
                 if note in self.note_pattern:
                     x = fret * 50 + self.x_offset
                     y = string * 30 + self.y_offset
-                    self.add_note_item(x, y, note, is_first_note)
+                    self.add_note_item(x, y, note, is_first_note, degree_index)
 
-    def add_note_item(self, x, y, note, is_first_note=False):
-        note_item = NoteItem(x, y, note, is_first_note)
+    def add_note_item(self, x, y, note, is_first_note=False, degree_index=None):
+        note_item = NoteItem(x, y, note, is_first_note, degree_index, self.show_all_colors)
         self.scene.addItem(note_item)
 
     def generate_chord_notes(self, root, chord_type):
         chord_notes = []
+        self.note_degrees = {}  # Réinitialiser le dictionnaire des degrés
         # Vérifier si l'accord est mineur et ajuster la tonalité
         if chord_type == "minor":
             key_info = get_key_signature(f"{root} {chord_type}")
@@ -390,6 +434,9 @@ class GuitarNeck:
         for interval in CHORDS_INTERVALS[chord_type]:
             chord_note = get_note_by_interval(root, interval,use_sharps)
             chord_notes.append(chord_note)
+            # Mapper la note à son degré pour la couleur
+            degree_index = INTERVAL_TO_DEGREE.get(interval, 0)
+            self.note_degrees[chord_note] = degree_index
         self.note_pattern = chord_notes
         self.create_notes(use_sharps)
         # Create and add the chord label
@@ -402,7 +449,7 @@ def main():
     dark_palette = QPalette()
     dark_palette.setColor(QPalette.Window, Qt.black)  # Fond noir
     dark_palette.setColor(QPalette.WindowText, Qt.white)  # Texte blanc
-    dark_palette.setColor(QPalette.Base, Qt.darkGray)  # Fond des widgets
+    dark_palette.setColor(QPalette.Base, Qt.black)  # Fond des widgets
     dark_palette.setColor(QPalette.AlternateBase, Qt.darkGray)
     dark_palette.setColor(QPalette.ToolTipBase, Qt.white)
     dark_palette.setColor(QPalette.ToolTipText, Qt.white)
@@ -491,10 +538,23 @@ def main():
     # Créer un QComboBox et ajouter les noms des patterns
     combo_box = SpaceComboBox()
     combo_box.setMaxVisibleItems(30)
-    # Définir une nouvelle police et l'appliquer au QComboBox
     combo_box.setFont(font)
-    combo_box.setPalette(dark_palette)
-    combo_box.setFocusPolicy(Qt.StrongFocus)      # important pour recevoir la barre d’espace
+    combo_box.setPalette(dark_palette)    
+    combo_box.setStyleSheet("""
+        QComboBox { 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+        QComboBox QAbstractItemView { 
+            background-color: darkgrey; 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+    """)    
+    combo_box.setFocusPolicy(Qt.StrongFocus)  # important pour recevoir la barre d’espace
+
 
     # Remplacer la vue interne par un QListView pour accéder aux barres de défilement
     view = QListView()
@@ -529,77 +589,195 @@ def main():
     for scale in scale_names:
         combo_box.addItem(f"Chords in Scale ({scale})")
 
+    # =============================================================================
+    # POSITIONS DES ÉLÉMENTS DE L'INTERFACE - Modifier ici pour ajuster la disposition
+    # =============================================================================
+    pos_visual_practice_x = 300
+    pos_visual_practice_y = -50
+    
+    pos_combo_box_x = 500
+    pos_combo_box_y = -50
+    
+    pos_strings_label_x = 1080
+    pos_strings_label_y = -50
+    pos_strings_combo_x = 1200
+    pos_strings_combo_y = -50
+    
+    pos_columns_label_x = 1320
+    pos_columns_label_y = -50
+    pos_columns_combo_x = 1450
+    pos_columns_combo_y = -50
+    
+    pos_frets_label_x = 1520
+    pos_frets_label_y = -50
+    pos_frets_combo_x = 1620
+    pos_frets_combo_y = -50
+    
+    pos_legend_title_x = 0
+    pos_legend_title_y = -100
+    pos_legend_start_x = 300
+    pos_legend_start_y = -90
+    pos_legend_spacing = 70
+    
+    pos_checkbox_x = 50
+    pos_checkbox_y = -50
+    # =============================================================================
+
     # Positionne le texte centré en haut
-    text_rect = scene.text_item.boundingRect()
-    text_x = 300
-    scene.text_item.setPos(text_x, -50)
+    scene.text_item.setPos(pos_visual_practice_x, pos_visual_practice_y)
     scene.addItem(scene.text_item)
     
     # Intégrer le QComboBox dans la scène en utilisant un QGraphicsProxyWidget
     proxy = QGraphicsProxyWidget()
     proxy.setWidget(combo_box)
-    combo_x = 500
-    proxy.setPos(combo_x, -50)
+    proxy.setPos(pos_combo_box_x, pos_combo_box_y)
     proxy.setZValue(100)
     scene.addItem(proxy)
     
-    text_item = QGraphicsTextItem("Strings : ")
-    text_item.setFont(font)
-    text_item.setDefaultTextColor(QColor(255, 165, 0))  # Orange
-    text_item.setPos(1080, -50)  # Position du texte
-    # Ajout à la scène
-    scene.addItem(text_item)
+    text_strings = QGraphicsTextItem("Strings : ")
+    text_strings.setFont(font)
+    text_strings.setDefaultTextColor(QColor(255, 165, 0))
+    text_strings.setPos(pos_strings_label_x, pos_strings_label_y)
+    scene.addItem(text_strings)
     
     string_combo_box = QComboBox()
     string_combo_box.setFont(font)
     string_combo_box.setPalette(dark_palette)
+    string_combo_box.setStyleSheet("""
+        QComboBox { 
+            background-color: darkgrey; 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+        QComboBox QAbstractItemView { 
+            background-color: darkgrey; 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+    """)
     for i in range(4, 11):
         string_combo_box.addItem(str(i), i)
     string_combo_box.setCurrentText("7")
     proxy2 = QGraphicsProxyWidget()
     proxy2.setWidget(string_combo_box)
-    proxy2.setPos(1200, -50)
+    proxy2.setPos(pos_strings_combo_x, pos_strings_combo_y)
     proxy2.setZValue(100)
     scene.addItem(proxy2)
 
-    text_item = QGraphicsTextItem("Columns : ")
-    text_item.setFont(font)
-    text_item.setDefaultTextColor(QColor(255, 165, 0))  # Orange
-    text_item.setPos(1320, -50)  # Position du texte
-    # Ajout à la scène
-    scene.addItem(text_item)
+    text_columns = QGraphicsTextItem("Columns : ")
+    text_columns.setFont(font)
+    text_columns.setDefaultTextColor(QColor(255, 165, 0))
+    text_columns.setPos(pos_columns_label_x, pos_columns_label_y)
+    scene.addItem(text_columns)
     
     columns_combo_box = QComboBox()
     columns_combo_box.setFont(font)
     columns_combo_box.setPalette(dark_palette)
+    columns_combo_box.setStyleSheet("""
+        QComboBox { 
+            background-color: darkgrey; 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+        QComboBox QAbstractItemView { 
+            background-color: darkgrey; 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+    """)
     for i in range(2, 7):
         columns_combo_box.addItem(str(i), i)
     columns_combo_box.setCurrentText("3")
     proxy3 = QGraphicsProxyWidget()
     proxy3.setWidget(columns_combo_box)
-    proxy3.setPos(1450, -50)
+    proxy3.setPos(pos_columns_combo_x, pos_columns_combo_y)
     proxy3.setZValue(100)
     scene.addItem(proxy3)
     
-    text_item = QGraphicsTextItem("Frets : ")
-    text_item.setFont(font)
-    text_item.setDefaultTextColor(QColor(255, 165, 0))  # Orange
-    text_item.setPos(1520, -50)  # Position du texte
-    # Ajout à la scène
-    scene.addItem(text_item)
+    text_frets = QGraphicsTextItem("Frets : ")
+    text_frets.setFont(font)
+    text_frets.setDefaultTextColor(QColor(255, 165, 0))
+    text_frets.setPos(pos_frets_label_x, pos_frets_label_y)
+    scene.addItem(text_frets)
     
     frets_combo_box = QComboBox()
     frets_combo_box.setFont(font)
     frets_combo_box.setPalette(dark_palette)
+    frets_combo_box.setStyleSheet("""
+        QComboBox { 
+            background-color: darkgrey; 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+        QComboBox QAbstractItemView { 
+            background-color: darkgrey; 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold; 
+        }
+    """)
     frets_combo_box.setMaxVisibleItems(15)
     for i in range(12, 25):
         frets_combo_box.addItem(str(i), i)
     frets_combo_box.setCurrentText("12")
     proxy4 = QGraphicsProxyWidget()
     proxy4.setWidget(frets_combo_box)
-    proxy4.setPos(1620, -50)
+    proxy4.setPos(pos_frets_combo_x, pos_frets_combo_y)
     proxy4.setZValue(100)
     scene.addItem(proxy4)
+    
+    # Légende des degrés
+    legend_title = QGraphicsTextItem("Degrees Legend:")
+    legend_title.setFont(font)
+    legend_title.setDefaultTextColor(QColor(255, 165, 0))
+    legend_title.setPos(pos_legend_title_x, pos_legend_title_y)
+    scene.addItem(legend_title)
+    
+    degree_names = ["I", "II", "III", "IV", "V", "VI", "VII"]
+    for i in range(7):
+        # Créer un cercle coloré pour chaque degré
+        degree_circle = QGraphicsEllipseItem(0, 0, 20, 20)
+        degree_circle.setBrush(QBrush(QColor(NOTE_COLOR)))
+        degree_pen = QPen()
+        degree_pen.setWidth(3)
+        degree_pen.setColor(QColor(DEGREE_COLORS[i]))
+        degree_circle.setPen(degree_pen)
+        degree_circle.setPos(pos_legend_start_x + (i * pos_legend_spacing), pos_legend_start_y)
+        scene.addItem(degree_circle)
+        
+        # Ajouter le texte du degré
+        degree_text = QGraphicsTextItem(degree_names[i])
+        degree_font = QFont("Courier New")
+        degree_font.setPointSize(NOTE_FONT_SIZE)
+        degree_font.setBold(True)
+        degree_text.setFont(degree_font)
+        degree_text.setDefaultTextColor(QColor("white"))
+        degree_text.setPos(pos_legend_start_x + 20 + (i * pos_legend_spacing), pos_legend_start_y + 5)
+        scene.addItem(degree_text)
+    
+    # Checkbox pour activer/désactiver toutes les couleurs
+    color_checkbox = QCheckBox("All Degrees Colors")
+    color_checkbox.setChecked(False)
+    color_checkbox.setFont(font)
+    color_checkbox.setPalette(dark_palette)
+    color_checkbox.setStyleSheet("""
+        QCheckBox { 
+            font-size: 18px; 
+            font-family: 'Engraved MT'; 
+            font-weight: bold;
+            color: orange;
+        }
+    """)
+    proxy_checkbox = QGraphicsProxyWidget()
+    proxy_checkbox.setWidget(color_checkbox)
+    proxy_checkbox.setPos(pos_checkbox_x, pos_checkbox_y)
+    proxy_checkbox.setZValue(100)
+    scene.addItem(proxy_checkbox)
     
     
     def clear_scene():
@@ -611,6 +789,7 @@ def main():
         num_strings = string_combo_box.currentData()  # Sélection du nombre de cordes
         num_columns = columns_combo_box.currentData() # Sélection du nombre de colonnes
         num_frets = frets_combo_box.currentData()     # Sélection du nombre de frets
+        show_all_colors = color_checkbox.isChecked()  # État de la checkbox
         # Effacer tous les éléments de la scène
         clear_scene()
 
@@ -627,13 +806,13 @@ def main():
                     x_offset = (i % num_columns) * 62.5 * num_frets
                     y_offset = (i // num_columns) * 42 * num_strings
                     # Mettre à jour le manche avec les notes de la gamme
-                    guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
+                    guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, show_all_colors=show_all_colors)
                     guitar_neck.generate_chord_notes(root,chord_type)
 
                 for i in range(7,12): #keep blank guitar neck
                     x_offset = (i % num_columns) * 62.5 * num_frets
                     y_offset = (i // num_columns) * 42 * num_strings
-                    guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
+                    guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, show_all_colors=show_all_colors)
         #---------------------------------------------------------------------------------------
         elif "All Chords -" in selected_pattern_name:
             pattern = selected_pattern_name.split("-")[-1]
@@ -647,7 +826,7 @@ def main():
                 y_offset = (i // num_columns) * 42 * num_strings
                 key_info = get_key_signature(tonality)
                 use_sharps = key_info["use_sharps"]
-                guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets)
+                guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, show_all_colors=show_all_colors)
                 guitar_neck.generate_chord_notes(tonality.split()[0],pattern)
                 i += 1
         #---------------------------------------------------------------------------------------
@@ -662,7 +841,7 @@ def main():
                 y_offset = (i // num_columns) * 42 * num_strings
                 key_info = get_key_signature(tonality)
                 use_sharps = key_info["use_sharps"]
-                guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, scale)
+                guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, scale, show_all_colors=show_all_colors)
                 guitar_neck.create_root_label(f"{tonality.split()[0]} {selected_pattern_name}")
                 guitar_neck.create_notes(use_sharps)
                 i += 1
@@ -676,6 +855,7 @@ def main():
     string_combo_box.currentTextChanged.connect(update_scene)
     columns_combo_box.currentTextChanged.connect(update_scene)
     frets_combo_box.currentTextChanged.connect(update_scene)
+    color_checkbox.stateChanged.connect(update_scene)
     view = ZoomableGraphicsView(scene)
     view.scale(1 / 1.4, 1 / 1.4)
     view.centerOn(0, 0)
