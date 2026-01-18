@@ -1,4 +1,5 @@
 import sys
+import os
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
@@ -241,6 +242,21 @@ def generate_scales_in_cycle(scale_type, is_minor=False):
     
     return all_scales
 
+def create_styled_combo_box(font, palette, items=None, current_text=None):
+    """Helper function to create a styled combo box with common settings."""
+    combo = QComboBox()
+    combo.setFont(font)
+    combo.setPalette(palette)
+    if items:
+        for item in items:
+            if isinstance(item, tuple):
+                combo.addItem(str(item[0]), item[1])
+            else:
+                combo.addItem(item)
+    if current_text:
+        combo.setCurrentText(current_text)
+    return combo
+
 class SpaceComboBox(QComboBox):
     """QComboBox qui avance/recul de façon circulaire avec Haut, Bas ou Espace."""
     def keyPressEvent(self, event):
@@ -345,7 +361,11 @@ class NeckItem(QGraphicsItem):
         return QRectF(0, 0, (self.frets + 1) * 50, self.strings * 30)
 
     def paint(self, painter: QPainter, option, widget=None):
+        painter.setRenderHint(QPainter.Antialiasing, True)
+        painter.setRenderHint(QPainter.TextAntialiasing, True)
+        painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
         pen = QPen(QColor(NECK_COLOR))  # Définir la couleur du stylo pour les lignes
+        pen.setCosmetic(True)  # Épaisseur constante indépendante du zoom
         painter.setPen(pen)
         for fret in range(self.frets + 1):
             for string in range(self.strings):
@@ -444,6 +464,9 @@ class GuitarNeck:
         self.create_root_label(label_text)
 
 def main():
+    # Optimisation pour High DPI et compatibilité multiplateforme
+    QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+    
     app = QApplication(sys.argv)
     
     dark_palette = QPalette()
@@ -517,16 +540,21 @@ def main():
     scene = QGraphicsScene()
     scene.setSceneRect(-100, -100, 6000, 3000)  # Définir la taille de la scène
 
-    # Ajoute l'image en arrière-plan
-    pixmap = QPixmap("guitar.png")  # Remplace par le chemin de ton image
-    # Agrandir l'image par 2
-    scaled_pixmap = pixmap.scaled(pixmap.width() * 2, pixmap.height() * 2)
-    scene.image_item = QGraphicsPixmapItem(scaled_pixmap)
-    scene.image_item.setPos(0, 0)  # Positionne l'image
-    opacity_effect = QGraphicsOpacityEffect()
-    opacity_effect.setOpacity(0.3)  # X% de transparence
-    scene.image_item.setGraphicsEffect(opacity_effect)
-    scene.addItem(scene.image_item)
+    # Ajoute l'image en arrière-plan (avec vérification d'existence)
+    image_path = "guitar.png"
+    if os.path.exists(image_path):
+        pixmap = QPixmap(image_path)
+        if not pixmap.isNull():
+            # Agrandir l'image par 2
+            scaled_pixmap = pixmap.scaled(pixmap.width() * 2, pixmap.height() * 2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            scene.image_item = QGraphicsPixmapItem(scaled_pixmap)
+            scene.image_item.setPos(0, 0)  # Positionne l'image
+            opacity_effect = QGraphicsOpacityEffect()
+            opacity_effect.setOpacity(0.3)  # X% de transparence
+            scene.image_item.setGraphicsEffect(opacity_effect)
+            scene.addItem(scene.image_item)
+    else:
+        scene.image_item = None  # Pas d'image de fond
     
     # Ajoute le texte
     scene.text_item = QGraphicsTextItem("Visual Practice : ")
@@ -539,20 +567,7 @@ def main():
     combo_box = SpaceComboBox()
     combo_box.setMaxVisibleItems(30)
     combo_box.setFont(font)
-    combo_box.setPalette(dark_palette)    
-    combo_box.setStyleSheet("""
-        QComboBox { 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-        QComboBox QAbstractItemView { 
-            background-color: darkgrey; 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-    """)    
+    combo_box.setPalette(dark_palette)  
     combo_box.setFocusPolicy(Qt.StrongFocus)  # important pour recevoir la barre d’espace
 
 
@@ -563,17 +578,6 @@ def main():
     # Élargir la scrollbar verticale
     scrollbar = view.verticalScrollBar()
     scrollbar.setFixedWidth(35)  # largeur en px
-    scrollbar.setStyleSheet("""
-    QScrollBar:vertical {
-        background: #333;
-        width: 35px;
-        margin: 0px;
-    }
-    QScrollBar::handle:vertical {
-        background: #777;
-        min-height: 20px;
-    }
-    """)
     
     # Élargir la liste déroulante
     view.setMinimumWidth(450)  # largeur de la fenêtre déroulante en px
@@ -619,7 +623,7 @@ def main():
     pos_legend_start_y = -90
     pos_legend_spacing = 70
     
-    pos_checkbox_x = 50
+    pos_checkbox_x = 0
     pos_checkbox_y = -50
     # =============================================================================
 
@@ -640,26 +644,7 @@ def main():
     text_strings.setPos(pos_strings_label_x, pos_strings_label_y)
     scene.addItem(text_strings)
     
-    string_combo_box = QComboBox()
-    string_combo_box.setFont(font)
-    string_combo_box.setPalette(dark_palette)
-    string_combo_box.setStyleSheet("""
-        QComboBox { 
-            background-color: darkgrey; 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-        QComboBox QAbstractItemView { 
-            background-color: darkgrey; 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-    """)
-    for i in range(4, 11):
-        string_combo_box.addItem(str(i), i)
-    string_combo_box.setCurrentText("7")
+    string_combo_box = create_styled_combo_box(font, dark_palette, [(i, i) for i in range(4, 11)], "7")
     proxy2 = QGraphicsProxyWidget()
     proxy2.setWidget(string_combo_box)
     proxy2.setPos(pos_strings_combo_x, pos_strings_combo_y)
@@ -672,26 +657,7 @@ def main():
     text_columns.setPos(pos_columns_label_x, pos_columns_label_y)
     scene.addItem(text_columns)
     
-    columns_combo_box = QComboBox()
-    columns_combo_box.setFont(font)
-    columns_combo_box.setPalette(dark_palette)
-    columns_combo_box.setStyleSheet("""
-        QComboBox { 
-            background-color: darkgrey; 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-        QComboBox QAbstractItemView { 
-            background-color: darkgrey; 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-    """)
-    for i in range(2, 7):
-        columns_combo_box.addItem(str(i), i)
-    columns_combo_box.setCurrentText("3")
+    columns_combo_box = create_styled_combo_box(font, dark_palette, [(i, i) for i in range(2, 7)], "3")
     proxy3 = QGraphicsProxyWidget()
     proxy3.setWidget(columns_combo_box)
     proxy3.setPos(pos_columns_combo_x, pos_columns_combo_y)
@@ -704,27 +670,8 @@ def main():
     text_frets.setPos(pos_frets_label_x, pos_frets_label_y)
     scene.addItem(text_frets)
     
-    frets_combo_box = QComboBox()
-    frets_combo_box.setFont(font)
-    frets_combo_box.setPalette(dark_palette)
-    frets_combo_box.setStyleSheet("""
-        QComboBox { 
-            background-color: darkgrey; 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-        QComboBox QAbstractItemView { 
-            background-color: darkgrey; 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold; 
-        }
-    """)
+    frets_combo_box = create_styled_combo_box(font, dark_palette, [(i, i) for i in range(12, 25)], "12")
     frets_combo_box.setMaxVisibleItems(15)
-    for i in range(12, 25):
-        frets_combo_box.addItem(str(i), i)
-    frets_combo_box.setCurrentText("12")
     proxy4 = QGraphicsProxyWidget()
     proxy4.setWidget(frets_combo_box)
     proxy4.setPos(pos_frets_combo_x, pos_frets_combo_y)
@@ -756,7 +703,7 @@ def main():
         degree_font.setPointSize(NOTE_FONT_SIZE)
         degree_font.setBold(True)
         degree_text.setFont(degree_font)
-        degree_text.setDefaultTextColor(QColor("white"))
+        degree_text.setDefaultTextColor(QColor(255, 165, 0))
         degree_text.setPos(pos_legend_start_x + 20 + (i * pos_legend_spacing), pos_legend_start_y + 5)
         scene.addItem(degree_text)
     
@@ -764,15 +711,9 @@ def main():
     color_checkbox = QCheckBox("All Degrees Colors")
     color_checkbox.setChecked(False)
     color_checkbox.setFont(font)
-    color_checkbox.setPalette(dark_palette)
-    color_checkbox.setStyleSheet("""
-        QCheckBox { 
-            font-size: 18px; 
-            font-family: 'Engraved MT'; 
-            font-weight: bold;
-            color: orange;
-        }
-    """)
+    checkbox_palette = QPalette()
+    checkbox_palette.setColor(QPalette.WindowText, QColor(255, 165, 0))
+    color_checkbox.setPalette(checkbox_palette)
     proxy_checkbox = QGraphicsProxyWidget()
     proxy_checkbox.setWidget(color_checkbox)
     proxy_checkbox.setPos(pos_checkbox_x, pos_checkbox_y)
@@ -781,19 +722,21 @@ def main():
     
     
     def clear_scene():
-        for item in scene.items():
-            if isinstance(item, (NeckItem, NoteItem, NoteTextItem, FretLabelItem, ChordLabelItem)):
-                scene.removeItem(item)
+        # More efficient: filter and remove in one pass
+        for item in [i for i in scene.items() if isinstance(i, (NeckItem, NoteItem, NoteTextItem, FretLabelItem, ChordLabelItem))]:
+            scene.removeItem(item)
 
     def update_scene():
-        num_strings = string_combo_box.currentData()  # Sélection du nombre de cordes
-        num_columns = columns_combo_box.currentData() # Sélection du nombre de colonnes
-        num_frets = frets_combo_box.currentData()     # Sélection du nombre de frets
-        show_all_colors = color_checkbox.isChecked()  # État de la checkbox
-        # Effacer tous les éléments de la scène
+        num_strings = string_combo_box.currentData()
+        num_columns = columns_combo_box.currentData()
+        num_frets = frets_combo_box.currentData()
+        show_all_colors = color_checkbox.isChecked()
+        
+        # Cache frequently used multipliers
+        x_multiplier = 62.5 * num_frets
+        y_multiplier = 42 * num_strings
+        
         clear_scene()
-
-        # Récupérer le pattern sélectionné
         selected_pattern_name = combo_box.currentText()
     
         # Vérifier si on a sélectionné une gamme diatonique
@@ -802,49 +745,35 @@ def main():
             if key in Chords_scales:
                 scale = Chords_scales[key]
                 for i, (root, chord_type) in enumerate(scale):
-                    # Calculer les offsets
-                    x_offset = (i % num_columns) * 62.5 * num_frets
-                    y_offset = (i // num_columns) * 42 * num_strings
-                    # Mettre à jour le manche avec les notes de la gamme
+                    x_offset = (i % num_columns) * x_multiplier
+                    y_offset = (i // num_columns) * y_multiplier
                     guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, show_all_colors=show_all_colors)
-                    guitar_neck.generate_chord_notes(root,chord_type)
+                    guitar_neck.generate_chord_notes(root, chord_type)
 
-                for i in range(7,12): #keep blank guitar neck
-                    x_offset = (i % num_columns) * 62.5 * num_frets
-                    y_offset = (i // num_columns) * 42 * num_strings
+                for i in range(7, 12):  # keep blank guitar neck
+                    x_offset = (i % num_columns) * x_multiplier
+                    y_offset = (i // num_columns) * y_multiplier
                     guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, show_all_colors=show_all_colors)
         #---------------------------------------------------------------------------------------
         elif "All Chords -" in selected_pattern_name:
             pattern = selected_pattern_name.split("-")[-1]
-            if pattern.__contains__("minor"):
-                cycle = cycle_of_fifths_minor 
-            else: 
-                cycle = cycle_of_fifths_major
-            i = 0
-            for tonality in cycle:
-                x_offset = (i % num_columns) * 62.5 * num_frets
-                y_offset = (i // num_columns) * 42 * num_strings
-                key_info = get_key_signature(tonality)
-                use_sharps = key_info["use_sharps"]
+            cycle = cycle_of_fifths_minor if "minor" in pattern else cycle_of_fifths_major
+            for i, tonality in enumerate(cycle):
+                x_offset = (i % num_columns) * x_multiplier
+                y_offset = (i // num_columns) * y_multiplier
                 guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, show_all_colors=show_all_colors)
-                guitar_neck.generate_chord_notes(tonality.split()[0],pattern)
-                i += 1
+                guitar_neck.generate_chord_notes(tonality.split()[0], pattern)
         #---------------------------------------------------------------------------------------
         else:
-            if selected_pattern_name.__contains__("minor"):
-                Scales = generate_scales_in_cycle(selected_pattern_name,is_minor=True)
-            else:
-                Scales = generate_scales_in_cycle(selected_pattern_name)
-            i = 0
-            for tonality,scale in Scales.items():
-                x_offset = (i % num_columns) * 62.5 * num_frets
-                y_offset = (i // num_columns) * 42 * num_strings
+            Scales = generate_scales_in_cycle(selected_pattern_name, is_minor="minor" in selected_pattern_name)
+            for i, (tonality, scale) in enumerate(Scales.items()):
+                x_offset = (i % num_columns) * x_multiplier
+                y_offset = (i // num_columns) * y_multiplier
                 key_info = get_key_signature(tonality)
                 use_sharps = key_info["use_sharps"]
                 guitar_neck = GuitarNeck(scene, x_offset, y_offset, num_strings, num_frets, scale, show_all_colors=show_all_colors)
                 guitar_neck.create_root_label(f"{tonality.split()[0]} {selected_pattern_name}")
                 guitar_neck.create_notes(use_sharps)
-                i += 1
         view.resetTransform()
         view.scale(1 / 1.4, 1 / 1.4)
         view.centerOn(0, 0)
